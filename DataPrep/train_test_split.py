@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.model_selection import StratifiedShuffleSplit, StratifiedKFold
 # import sys
 
-
+#stratified splits train and test as well as stratified splits training for kfold
 class DataPreprocessing:
     def __init__(self, complaint_docs):
         self.complaint_docs = complaint_docs
@@ -68,14 +68,12 @@ class DataPreprocessing:
         count = 0
         for strat_train_kfold_index, strat_test_kfold_index in kfold.split(X, y):
             X_train_kfold, X_test_kfold = X.iloc[list(strat_train_kfold_index)], X.iloc[list(strat_test_kfold_index)]
-            # print(type(X_train_kfold))
-            # print(type(X_test_kfold))
-            print(X_train_kfold)
-            print(X_test_kfold)
+            # print(X_train_kfold)
+            # print(X_test_kfold)
             X_train_kfold.to_csv(os.path.join(path, f"CV_TrainData_{count}.csv"), sep="\t", index=False)
             X_test_kfold.to_csv(os.path.join(path, f"CV_TestData_{count}.csv"), sep="\t", index=False)
             count += 1
-            # y_train_kfold, y_test_kfold = y.loc[strat_train_kfold_index], y.loc[strat_test_kfold_index]
+
 
 
 
@@ -86,26 +84,3 @@ def main():
     dataProccess.cross_validation_data_prep(train_set)
 
 main()
-
-
-# 70/30 split on training and testing data
-# sss = StratifiedShuffleSplit(n_splits=1, test_size=0.3, random_state=42)
-#
-# for train_index, test_index in sss.split(X, y):
-#     X_train, X_test = X[train_index], X[test_index]
-#     y_train, y_test = y[train_index], y[test_index]
-#
-# # 70/30 split on training and validation data
-# sss1 = StratifiedShuffleSplit(n_splits=1, test_size=0.3, random_state=42)
-#
-# for train_index, valid_index in sss1.split(X_train, y_train):
-#     X_train, X_valid = X[train_index], X[valid_index]
-#     y_train, y_valid = y[train_index], y[valid_index]
-#
-# training_df = pd.DataFrame(X_train).join(y_train)
-# validation_df = pd.DataFrame(X_valid).join(y_valid)
-# testing_df = pd.DataFrame(X_test).join(y_test)
-#
-# training_df.to_csv('shariq_training_data.csv', index=False)
-# validation_df.to_csv('shariq_valid_data.csv', index=False)
-# testing_df.to_csv('shariq_testing_data.csv', index=False)
