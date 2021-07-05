@@ -1,0 +1,9 @@
+#ignore output directories
+CV_Results_Fold*
+
+#ignore .DS_store
+.DS_store
+
+#ignore private data
+*.txt
+*.csv
