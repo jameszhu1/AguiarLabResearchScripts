@@ -7,3 +7,6 @@ CV_Results_Fold*
 #ignore private data
 *.txt
 *.csv
+
+#ignore __pychache__
+__pycache__

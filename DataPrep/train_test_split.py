@@ -73,14 +73,12 @@ class DataPreprocessing:
             X_train_kfold.to_csv(os.path.join(path, f"CV_TrainData_{count}.csv"), sep="\t", index=False)
             X_test_kfold.to_csv(os.path.join(path, f"CV_TestData_{count}.csv"), sep="\t", index=False)
             count += 1
+        print("Finished kfold splitting....")
 
 
 
-
-def main():
-    dataProccess = DataPreprocessing("./GR_DN_corpus.csv")
+def train_test_main():
+    dataProccess = DataPreprocessing("./DataPrep/GR_DN_corpus.csv")
     cleaned = dataProccess.clean()
     train_set = dataProccess.train_test_seperation(cleaned)
     dataProccess.cross_validation_data_prep(train_set)
-
-main()

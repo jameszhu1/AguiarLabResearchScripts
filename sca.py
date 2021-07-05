@@ -9,16 +9,18 @@ import os
 import threading
 from datetime import datetime
 from sklearn.metrics import accuracy_score
+from DataPrep.train_test_split import *
 '''
 Trains, validates, and tests the sequential covering algorithm on simple and foil info gain criteria.
 Outputs rules_criteria.txt and predictions_criteria.txt depending on the criteria.
 '''
 
 class SequentialCoveringAlg:
-    def __init__(self, data, cutoff, type):
+    def __init__(self, data, cutoff, type, output=None):
         self.data = data
         self.cutoff = cutoff
         self.type = type
+        self.output = output
     #----------------------------------------------------------------------------------------------------------------------------------------------------------
     #cleans and helps for the sequential covering alg.
     def seperateTextToWords(self, remainingData):
@@ -135,14 +137,15 @@ class SequentialCoveringAlg:
 
         #-----------------RETURN RULE LIST--------------------
         #output rules to txt
-        # print("writing rules to output txt file....")
-        # cwd = os.getcwd()
-        # dir = f"Rules_{self.cutoff}"
-        # path = os.path.join(cwd, dir)
-        # os.mkdir(path)
-        # with open(os.path.join(path, f"rules_{self.type}_{self.cutoff}_.txt"), "w") as f:
-        #     for r in rule_list:
-        #         f.write(r + "\n")
+        if self.output == "yes":
+            print("writing rules to output txt file....")
+            cwd = os.getcwd()
+            dir = f"Rules_{self.cutoff}"
+            path = os.path.join(cwd, dir)
+            os.mkdir(path)
+            with open(os.path.join(path, f"rules_{self.type}_{self.cutoff}_.txt"), "w") as f:
+                for r in rule_list:
+                    f.write(r + "\n")
         #write highest thresholds in output txt
         # with open("highest_thresholds_foil.txt", "w") as f1:
         #     highest_thresholds = sorted(list(set(highest_thresholds)))
@@ -151,7 +154,7 @@ class SequentialCoveringAlg:
         return rule_list
         print("Done.")
 
-    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------------------------------------------------
     '''
     predicts testing data.
     '''
@@ -174,7 +177,6 @@ class SequentialCoveringAlg:
         prediction_labels = predictions["MotionResultCode"].tolist()
         return prediction_labels
 
-
     '''
     computes classification accuracy.
     '''
@@ -188,12 +190,12 @@ class SequentialCoveringAlg:
         return ca
 
 
-
+#--------------------------------------------------------------------------------------------------------------
 
 
 def crossValidation(criteria_type, count):
     if criteria_type == "simple":
-        list_of_threshold = np.arange(0.5, 0.9, 0.1)
+        list_of_threshold = np.arange(0.4, 0.9, 0.1)
     else:
         list_of_threshold = np.arange(0, 50, 1)
 
@@ -228,21 +230,29 @@ def startMultithreadCrossValidation(criteria_type):
     [thread.join() for thread in threads]
 
     end_time = datetime.now()
-    print("--------------------Exit time: ", (nd - st).total_seconds(), " ----------------------------")
-
-
+    print("--------------------Exit time: ", (end_time - start_time).total_seconds(), " ----------------------------")
 
 
 
 
 
 if __name__ =='__main__':
-    startMultithreadCrossValidation("simple")
+
     #This allows parameters to be passed in the command line.
-    # trainingData = sys.argv[1]
-    # cutoff = sys.argv[2]
-    # type = sys.argv[3]
-    # c = SequentialCoveringAlg("./DataPrep/TrainTest/TrainingData.csv", 0.0, "foil")
-    # rules = c.Training_Rules()
-    # predictions = c.predict(rules, "./DataPrep/TrainTest/TestingData.csv", "predictions_output")
-    # c.classification_accuracy(predictions, "./DataPrep/TrainTest/TestingData.csv")
+    #cross validation:
+    if sys.argv[1] == "splitdata":
+        train_test_main()
+
+    if sys.argv[1] == "CV":
+        if sys.argv[2] == "simple":
+            startMultithreadCrossValidation("simple")
+        else:
+            startMultithreadCrossValidation("foil")
+    else:
+        training_data = sys.argv[1]
+        threshold = sys.argv[2]
+        criteria_type = sys.argv[3]
+        c = SequentialCoveringAlg(training_data, threshold, criteria_type, "yes")
+        rules = c.Training_Rules()
+        predictions = c.predict(rules, "./DataPrep/TrainTest/TestingData.csv")
+        c.classification_accuracy(predictions, "./DataPrep/TrainTest/TestingData.csv")
