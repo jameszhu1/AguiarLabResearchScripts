@@ -76,7 +76,6 @@ class SequentialCoveringAlg:
         highest_thresholds = []
         print(f"applying sca for {self.cutoff}...")
         while True:
-            dfWords = self.seperateTextToWords(GR_DN_nlp_training)
             dfGRwords = dfWords[dfWords["MotionResultCode"] == 1]
             dfDNwords = dfWords[dfWords["MotionResultCode"] == 0]
 
@@ -124,10 +123,13 @@ class SequentialCoveringAlg:
             rule_list.extend(rules_to_add_and_remove)
 
             #-------------------------------REMOVE DATA BASED ON RULE-----------------------
-            docid_to_remove = []
-            for rule in rules_to_add_and_remove:
-                GR_DN_nlp_training.drop(index=GR_DN_nlp_training[GR_DN_nlp_training["text"].str.contains(rule)].index, inplace=True)
+            # for rule in rules_to_add_and_remove:
+            #     GR_DN_nlp_training.drop(index=GR_DN_nlp_training[GR_DN_nlp_training["text"].str.contains(rule)].index, inplace=True)
+            GR_DN_nlp_training = GR_DN_nlp_training[~GR_DN_nlp_training["text"].str.contains('|'.join(rules_to_add_and_remove))]
 
+            df_docid_to_remove = dfWords[dfWords["word"].str.contains('|'.join(rules_to_add_and_remove))]
+            docid_to_be_removed = df_docid_to_remove["docid"].tolist()
+            dfWords = dfWords[~dfWords["docid"].isin(docid_to_be_removed)]
             #remove words from word dataframe
             GR_DN_nlp_training.reset_index(drop=True, inplace=True)
             #will print how mcuh data is left after removal. Ucomment if needed
@@ -281,8 +283,6 @@ if __name__ =='__main__':
         else:
             startMultithreadCrossValidation("foil")
             findThreshHold("foil", 1, 1)
-            #--------find best parameter-------------
-
 
     else:
         training_data = sys.argv[1]
