@@ -69,9 +69,9 @@ class SequentialCoveringAlg:
         rule_list = []
         #----------------------------SEQUENTIAL COVERING START----------------------------
         #INITIAL RULE FOR FOIL: if a word is in a GR document,  it is considered a rule
-        numGRwords = dfWords[dfWords["MotionResultCode"] == 1].shape[0]
-        totalWordCount = dfWords.shape[0]
-        constant = (numGRwords / totalWordCount)
+        numGR = GR_DN_nlp_training[GR_DN_nlp_training["MotionResultCode"] == 1].shape[0]
+        totaldocs = GR_DN_nlp_training.shape[0]
+        constant = numGR / totaldocs
         #for cross validation
         highest_thresholds = []
         print(f"applying sca for {self.cutoff}...")
