@@ -202,7 +202,7 @@ class SequentialCoveringAlg:
 
 def crossValidation(criteria_type, count):
     if criteria_type == "simple":
-        list_of_threshold = np.arange(0.4, 1.0, 0.1)
+        list_of_threshold = np.arange(0.3, 1.0, 0.1)
     else:
         list_of_threshold = np.arange(0, 50, 1)
 
@@ -221,8 +221,8 @@ def crossValidation(criteria_type, count):
         predictions = c.predict(rules, testing_data)
         ca = c.classification_accuracy(predictions, testing_data)
         print(str(threshold) + " : " + str(ca) + "\n")
-        results = str(threshold) + " : " + str(ca) + "\n"
 
+        results = str(ca) + "\n"
         with open(os.path.join(path, f"results.txt"), "a") as f:
             f.write(results)
 
@@ -240,6 +240,30 @@ def startMultithreadCrossValidation(criteria_type):
     print("--------------------Exit time: ", (end_time - start_time).total_seconds(), " ----------------------------")
 
 
+def findThreshHold(criteria, start, step):
+    directories = []
+    for i in range(5):
+        directories.append(os.path.join(os.getcwd(), f"CV_Results_Fold_{i}_{criteria}"))
+
+    list_of_values = {}
+    for dir in directories:
+        for filename in os.listdir(dir):
+            list_num = []
+            count = start
+            with open(os.path.join(dir, filename)) as f:
+                for line in f:
+                    line = line.rstrip("\n")
+                    num = float(line)
+                    if count in list_of_values:
+                        list_of_values[count].extend([num])
+                    else:
+                        list_of_values[count] = [num]
+                    count += step
+
+    average_d = {}
+    for key, value in list_of_values.items():
+        average_d[key] = statistics.mean(value)
+    print("best threshold value to stop making rules: ", max(average_d, key=average_d.get))
 
 
 
@@ -252,33 +276,13 @@ if __name__ =='__main__':
 
     elif sys.argv[1] == "CV":
         if sys.argv[2] == "simple":
-            startMultithreadCrossValidation("simple")
+            startMultithreadCrossValidation("simple", 0.3, 0.1)
+            findThreshHold("simple")
         else:
             startMultithreadCrossValidation("foil")
+            findThreshHold("foil", 1, 1)
             #--------find best parameter-------------
-            directories = []
-            for i in range(5):
-                directories.append(os.path.join(os.getcwd(), f"CV_Results_Fold_{i}_foil"))
 
-            list_of_values = {}
-            for dir in directories:
-                for filename in os.listdir(dir):
-                    list_num = []
-                    count = 0
-                    with open(os.path.join(dir, filename)) as f:
-                        for line in f:
-                            line = line.rstrip("\n")
-                            num = float(line)
-                            if count in list_of_values:
-                                list_of_values[count].extend([num])
-                            else:
-                                list_of_values[count] = [num]
-                            count += 1
-
-            average_d = {}
-            for key, value in list_of_values.items():
-                average_d[key] = statistics.mean(value)
-            print("best threshold value to stop making rules: ", max(average_d, key=average_d.get))
 
     else:
         training_data = sys.argv[1]
