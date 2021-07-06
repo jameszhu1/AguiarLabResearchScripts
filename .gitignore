@@ -10,3 +10,6 @@ CV_Results_Fold*
 
 #ignore __pychache__
 __pycache__
+
+#ignore any temp files
+temp*

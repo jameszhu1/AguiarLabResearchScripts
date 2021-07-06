@@ -5,8 +5,9 @@ from sklearn.model_selection import StratifiedShuffleSplit, StratifiedKFold
 
 #stratified splits train and test as well as stratified splits training for kfold
 class DataPreprocessing:
-    def __init__(self, complaint_docs):
+    def __init__(self, complaint_docs, dataprep_dir):
         self.complaint_docs = complaint_docs
+        self.dataprep_dir = os.path.join(os.getcwd(), dataprep_dir)
 
     def clean(self):
         print("reading csv file: new_corpus.csv ...")
@@ -40,8 +41,9 @@ class DataPreprocessing:
         #---------------------------------------------------------------------------
         #write training and testing to directory
         directory = "TrainTest"
+        dataprep_dir = "DataPrep"
         cwd = os.getcwd()
-        path = os.path.join(cwd, directory)
+        path = os.path.join(self.dataprep_dir, directory)
         os.mkdir(path)
         print("Directory '% s' created" % directory)
         #---------------------------------------------------------------------------
@@ -60,8 +62,7 @@ class DataPreprocessing:
         #---------------------------------------------------------------------------
         #make directory for outputed kfold cv set
         directory = "CrossValidationData"
-        cwd = os.getcwd()
-        path = os.path.join(cwd, directory)
+        path = os.path.join(self.dataprep_dir, directory)
         os.mkdir(path)
         print("Directory '% s' created" % directory)
         #---------------------------------------------------------------------------
@@ -78,7 +79,7 @@ class DataPreprocessing:
 
 
 def train_test_main():
-    dataProccess = DataPreprocessing("./DataPrep/GR_DN_corpus.csv")
+    dataProccess = DataPreprocessing("./DataPrep/GR_DN_corpus.csv", "./DataPrep")
     cleaned = dataProccess.clean()
     train_set = dataProccess.train_test_seperation(cleaned)
     dataProccess.cross_validation_data_prep(train_set)
