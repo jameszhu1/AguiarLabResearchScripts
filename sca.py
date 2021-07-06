@@ -204,7 +204,7 @@ class SequentialCoveringAlg:
 
 def crossValidation(criteria_type, count):
     if criteria_type == "simple":
-        list_of_threshold = np.arange(0.3, 1.0, 0.1)
+        list_of_threshold = np.arange(0.6, 0.9, 0.01)
     else:
         list_of_threshold = np.arange(0, 50, 1)
 
@@ -278,7 +278,7 @@ if __name__ =='__main__':
 
     elif sys.argv[1] == "CV":
         if sys.argv[2] == "simple":
-            startMultithreadCrossValidation("simple", 0.3, 0.1)
+            startMultithreadCrossValidation("simple", 0.6, 0.01)
             findThreshHold("simple")
         else:
             startMultithreadCrossValidation("foil")
@@ -295,4 +295,4 @@ if __name__ =='__main__':
 
 #run split data: python3 sca.py splitdata
 #run cross validation: python3 sca.py CV simple
-#run final train, test: python3 sca.py ./DataPrep/TrainTest/TrainingData.csv 0.6 simple
+#run final train, test: python3 sca.py ./DataPrep/TrainTest/TrainingData.csv 0.75 simple
